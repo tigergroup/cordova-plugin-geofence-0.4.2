@@ -1,16 +1,16 @@
 package com.cowbell.cordova.geofence;
 
 import com.google.android.gms.location.Geofence;
-import com.google.gson.annotations.Expose;
+import com.google.gson.Gson;
 
 public class GeoNotification {
-    @Expose public String id;
-    @Expose public double latitude;
-    @Expose public double longitude;
-    @Expose public int radius;
-    @Expose public int transitionType;
+    public String id;
+    public double latitude;
+    public double longitude;
+    public int radius;
+    public int transitionType;
 
-    @Expose public Notification notification;
+    public Notification notification;
 
     public GeoNotification() {
     }
@@ -23,12 +23,12 @@ public class GeoNotification {
     }
 
     public String toJson() {
-        return Gson.get().toJson(this);
+        return new Gson().toJson(this);
     }
 
     public static GeoNotification fromJson(String json) {
         if (json == null)
             return null;
-        return Gson.get().fromJson(json, GeoNotification.class);
+        return new Gson().fromJson(json, GeoNotification.class);
     }
 }

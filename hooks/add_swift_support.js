@@ -4,37 +4,26 @@ var child_process = require('child_process'),
 
 module.exports = function(context) {
     var IOS_DEPLOYMENT_TARGET = '7.0',
-        COMMENT_KEY = /_comment$/;
+        COMMENT_KEY = /_comment$/,
+        projectRoot = process.argv[2];
 
-    run();
+    //if run for plugin projectRoot initialy is platform
+    projectRoot = path.resolve(path.join(projectRoot,'..'));
 
-    function run() {
+    run(projectRoot);
+
+    function run(projectRoot) {
         var cordova_util = context.requireCordovaModule('cordova-lib/src/cordova/util'),
             ConfigParser = context.requireCordovaModule('cordova-lib/src/configparser/ConfigParser'),
-            projectRoot = cordova_util.isCordova(),
-            platform_ios,
+            platforms = context.requireCordovaModule('cordova-lib/src/plugman/platforms'),
             xml = cordova_util.projectConfig(projectRoot),
             cfg = new ConfigParser(xml),
             projectName = cfg.name(),
             iosPlatformPath = path.join(projectRoot, 'platforms', 'ios'),
             iosProjectFilesPath = path.join(iosPlatformPath, projectName),
-            projectFile,
-            xcodeProject,
+            projectFile = platforms['ios'].parseProjectFile(iosPlatformPath),
+            xcodeProject = projectFile.xcode,
             bridgingHeaderPath;
-
-        try {
-            // try pre-5.0 cordova structure
-            platform_ios = context.requireCordovaModule('cordova-lib/src/plugman/platforms')['ios'];
-            projectFile = platform_ios.parseProjectFile(iosPlatformPath);
-        } catch (e) {
-            console.log("Looks like we're in Cordova 5.0 and above...");
-            // let's try cordova 5.0 structure
-            platform_ios = context.requireCordovaModule('cordova-lib/src/plugman/platforms/ios');
-            projectFile = platform_ios.parseProjectFile(iosPlatformPath);
-        }
-
-        // hopefully projectFile can't go null here.......
-        xcodeProject = projectFile.xcode;
 
         bridgingHeaderPath = getBridgingHeader(xcodeProject);
         if(bridgingHeaderPath) {

@@ -67,13 +67,14 @@ public class GeofencePlugin extends CordovaPlugin {
             callbackContext.success(Gson.get().toJson(geoNotifications));
         } else if (action.equals("initialize")) {
             callbackContext.success();
+
         } else if (action.equals("deviceReady")) {
             deviceReady();
-            callbackContext.success();
         } else {
             return false;
         }
         return true;
+
     }
 
     private GeoNotification parseFromJSONObject(JSONObject object) {

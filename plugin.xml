@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest" xmlns:android="http://schemas.android.com/apk/res/android" id="cordova-plugin-geofence" version="0.4.1">
+<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0" xmlns:m2="http://schemas.microsoft.com/appx/2013/manifest" xmlns:android="http://schemas.android.com/apk/res/android" id="cordova-plugin-geofence" version="0.5.0">
     <name>geofence</name>
     <description>Geofence plugin</description>
     <license>Apache 2.0</license>
@@ -20,8 +20,6 @@
     </js-module>
 
     <dependency id="es6-promise-plugin" />
-    <dependency id="cordova-plugin-android-support-v4" />
-    <dependency id="cordova-plugin-googleplayservices" />
 
     <!-- android -->
     <platform name="android">
@@ -46,6 +44,7 @@
         <source-file src="src/android/ReceiveTransitionsIntentService.java" target-dir="src/com/cowbell/cordova/geofence" />
         <source-file src="src/android/RemoveGeofenceCommand.java" target-dir="src/com/cowbell/cordova/geofence" />
 
+        <framework src="com.google.android.gms:play-services-location:+" />
         <lib-file src="src/android/libs/gson-2.3.jar" />
 
         <config-file target="config.xml" parent="/*">
@@ -122,7 +121,6 @@
         </config-file>
         <config-file target="*-Info.plist" parent="UIBackgroundModes">
             <array>
-                <string>location</string>
                 <string>remote-notification</string>
             </array>
         </config-file>
@@ -134,6 +132,6 @@
         <header-file src="src/ios/Geo-Bridging-Header.h" />
         <source-file src="src/ios/GeofencePlugin.swift"/>
         <source-file src="src/ios/SwiftData.swift"/>
-        <source-file src="src/ios/json.swift"/>
+        <source-file src="src/ios/SwiftyJson.swift"/>
     </platform>
 </plugin>

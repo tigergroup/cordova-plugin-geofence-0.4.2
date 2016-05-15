@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-geofence",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Cordova geofence plugin",
   "cordova": {
     "id": "cordova-plugin-geofence",
@@ -28,7 +28,7 @@
     "cordova-windows"
   ],
   "author": "Cowbell Labs",
-  "license": "Apache 2.0",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/cowbell/cordova-plugin-geofence/issues"
   },
@@ -36,11 +36,11 @@
   "engines": [
     {
       "name": "cordova",
-      "version": ">=3.0.0"
+      "version": ">=5.0.0"
     }
   ],
   "devDependencies": {
     "cordova": "^5.0.0",
-    "cordova-paramedic": "tsubik/cordova-paramedic"
+    "cordova-paramedic": "^0.4.0"
   }
 }

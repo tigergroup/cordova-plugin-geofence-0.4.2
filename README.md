@@ -8,7 +8,7 @@ Android Build [![Build Status](https://circleci.com/gh/cowbell/cordova-plugin-ge
 
 Plugin to monitor circular geofences using mobile devices. The purpose is to notify user if crossing the boundary of the monitored geofence.
 
-*Geofences persists after device reboot. You do not have to open your app first to monitor added geofences*
+*Geofences persist after device reboot. You do not have to open your app first to monitor added geofences*
 
 ##Example application
 
@@ -32,7 +32,7 @@ cordova plugin add cordova-plugin-geofence
 Using cordova CLI
 
 ```
-cordova plugin rm com.cowbell.cordova.geofence
+cordova plugin rm cordova-plugin-geofence
 ```
 
 ## Supported Platforms
@@ -51,7 +51,7 @@ Cordova initialize plugin to `window.geofence` object.
 
 - `window.geofence.initialize(onSuccess, onError)`
 - `window.geofence.addOrUpdate(geofences, onSuccess, onError)`
-- `window.geofence.remove(onSuccess, onError)`
+- `window.geofence.remove(geofenceId, onSuccess, onError)`
 - `window.geofence.removeAll(onSuccess, onError)`
 - `window.geofence.getWatched(onSuccess, onError)`
 
@@ -215,6 +215,47 @@ window.geofence.onTransitionReceived = function (geofences) {
 };
 ```
 
+## Listening for geofence transitions in native code
+
+### Android
+
+For android plugin broadcasting intent `com.cowbell.cordova.geofence.TRANSITION`. You can implement your own `BroadcastReceiver` and start listening for this intent.
+
+Register receiver in `AndroidManifest.xml`
+
+```xml
+<receiver android:name="YOUR_APP_PACKAGE_NAME.TransitionReceiver">
+    <intent-filter>
+        <action android:name="com.cowbell.cordova.geofence.TRANSITION" />
+    </intent-filter>
+</receiver>
+```
+
+Example `TransitionReceiver.java` code
+
+```java
+......
+import com.cowbell.cordova.geofence.Gson;
+import com.cowbell.cordova.geofence.GeoNotification;
+
+public class TransitionReceiver extends BroadcastReceiver {
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        String error = intent.getStringExtra("error");
+
+        if (error != null) {
+            //handle error
+            Log.println(Log.ERROR, "YourAppTAG", error);
+        } else {
+            String geofencesJson = intent.getStringExtra("transitionData");
+            GeoNotification[] geoNotifications = Gson.get().fromJson(geofencesJson, GeoNotification[].class);
+            //handle geoNotifications objects
+        }
+    }
+}
+```
+
 ## When the app is opened via Notification click
 
 Android, iOS only
@@ -251,6 +292,10 @@ window.geofence.addOrUpdate({
 
 # Platform specifics
 
+##Android
+
+This plugin uses Google Play Services so you need to have it installed on your device.
+
 ##iOS
 
 Plugin is written in Swift. All xcode project options to enable swift support are set up automatically after plugin is installed.
@@ -271,8 +316,29 @@ If you are retargeting WP 8.0 to WP 8.1 you need to register background task to 
 </Extension>
 ```
 
+# Development
+
+##Installation
+
+- git clone https://github.com/cowbell/cordova-plugin-geofence
+- change into the new directory
+- `npm install`
+
+##Running tests
+
+- Start emulator
+- `cordova-paramedic --platform android --plugin .`
+
+###Testing on iOS
+
+Before you run `cordova-paramedic` install `npm install -g ios-sim`
+
+###Troubleshooting
+
+Add `--verbose` at the end of `cordova-paramedic` command.
+
 ##License
 
 This software is released under the [Apache 2.0 License](http://opensource.org/licenses/Apache-2.0).
 
-© 2014 Cowbell-labs. All rights reserved
+© 2014-2015 Cowbell-labs. All rights reserved

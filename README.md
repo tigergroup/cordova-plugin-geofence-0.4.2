@@ -2,6 +2,10 @@
 
 [![Code Climate](https://codeclimate.com/github/cowbell/cordova-plugin-geofence/badges/gpa.svg)](https://codeclimate.com/github/cowbell/cordova-plugin-geofence)
 
+iOS Build [![Build Status](https://travis-ci.org/cowbell/cordova-plugin-geofence.svg?branch=master)](https://travis-ci.org/cowbell/cordova-plugin-geofence)
+
+Android Build [![Build Status](https://circleci.com/gh/cowbell/cordova-plugin-geofence.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/cowbell/cordova-plugin-geofence)
+
 Plugin to monitor circular geofences using mobile devices. The purpose is to notify user if crossing the boundary of the monitored geofence.
 
 *Geofences persists after device reboot. You do not have to open your app first to monitor added geofences*
@@ -15,6 +19,12 @@ Check out our [example application](https://github.com/cowbell/ionic-geofence) b
 From master
 ```
 cordova plugin add https://github.com/cowbell/cordova-plugin-geofence
+```
+
+Latest stable version
+
+```
+cordova plugin add cordova-plugin-geofence
 ```
 
 ## Removing the Plugin from project
@@ -47,8 +57,8 @@ Cordova initialize plugin to `window.geofence` object.
 
 All methods returning promises, but you can also use standard callback functions.
 
-For listening of geofence transistion you can override receiveTransition method
-- `window.geofence.receiveTransition(geofences)`
+For listening of geofence transistion you can override onTransitionReceived method
+- `window.geofence.onTransitionReceived(geofences)`
 
 ## Constants
 
@@ -80,7 +90,10 @@ window.geofence.addOrUpdate({
         id:             Number, //optional should be integer, id of notification
         title:          String, //Title of notification
         text:           String, //Text of notification
+        smallIcon:      String, //Small icon showed in notification area, only res URI
+        icon:           String, //icon showed in notification drawer
         openAppOnClick: Boolean,//is main app activity should be opened after clicking on notification
+        vibration:      [Integer], //Optional vibration pattern - see description
         data:           Object  //Custom object associated with notification
     }
 }).then(function () {
@@ -99,6 +112,61 @@ Geofence overrides the previously one with the same `id`.
 *All geofences are stored on the device and restored to monitor after device reboot.*
 
 Notification overrides the previously one with the same `notification.id`.
+
+## Notification vibrations
+
+You can set vibration pattern for the notification or disable default vibrations.
+
+To change vibration pattern set `vibrate` property of `notification` object in geofence.
+
+###Examples
+
+```
+//disable vibrations
+notification: {
+    vibrate: [0]
+}
+```
+
+```
+//Vibrate for 1 sec
+//Wait for 0.5 sec
+//Vibrate for 2 sec
+notification: {
+    vibrate: [1000, 500, 2000]
+}
+```
+
+###Platform quirks
+
+Fully working only on Android.
+
+On iOS vibration pattern doesn't work. Plugin only allow to vibrate with default system pattern.
+
+Windows Phone - current status is TODO
+
+## Notification icons
+
+To set notification icons use `icon` and `smallIcon` property in `notification` object.
+
+As a value you can enter:
+- name of native resource or your application resource e.g. `res://ic_menu_mylocation`, `res://icon`, `res://ic_menu_call`
+- relative path to file in `www` directory e.g. `file://img/ionic.png`
+
+`smallIcon` - supports only resources URI
+
+###Examples
+
+```
+notification: {
+    smallIcon: 'res://my_location_icon',
+    icon: 'file://img/geofence.png'
+}
+```
+
+###Platform quirks
+
+Works only on Android platform so far.
 
 ## Removing
 
@@ -140,10 +208,20 @@ window.geofence.getWatched().then(function (geofencesJson) {
 ## Listening for geofence transitions
 
 ```javascript
-window.geofence.receiveTransition = function (geofences) {
+window.geofence.onTransitionReceived = function (geofences) {
     geofences.forEach(function (geo) {
         console.log('Geofence transition detected', geo);
     });
+};
+```
+
+## When the app is opened via Notification click
+
+Android, iOS only
+
+```javascript
+window.geofence.onNotificationClicked = function (notificationData) {
+    console.log('App opened from Geo Notification!', notificationData);
 };
 ```
 

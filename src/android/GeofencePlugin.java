@@ -11,10 +11,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Intent;
 import android.content.Context;
 import android.util.Log;
-
-import com.google.gson.Gson;
 
 public class GeofencePlugin extends CordovaPlugin {
     public static final String TAG = "GeofencePlugin";
@@ -65,10 +64,12 @@ public class GeofencePlugin extends CordovaPlugin {
         } else if (action.equals("getWatched")) {
             List<GeoNotification> geoNotifications = geoNotificationManager
                     .getWatched();
-            Gson gson = new Gson();
-            callbackContext.success(gson.toJson(geoNotifications));
+            callbackContext.success(Gson.get().toJson(geoNotifications));
         } else if (action.equals("initialize")) {
+            callbackContext.success();
 
+        } else if (action.equals("deviceReady")) {
+            deviceReady();
         } else {
             return false;
         }
@@ -82,10 +83,9 @@ public class GeofencePlugin extends CordovaPlugin {
         return geo;
     }
 
-    public static void fireRecieveTransition(List<GeoNotification> notifications) {
-        Gson gson = new Gson();
-        String js = "setTimeout('geofence.receiveTransition("
-                + gson.toJson(notifications) + ")',0)";
+    public static void onTransitionReceived(List<GeoNotification> notifications) {
+        String js = "setTimeout('geofence.onTransitionReceived("
+                + Gson.get().toJson(notifications) + ")',0)";
         if (webView == null) {
             Log.d(TAG, "Webview is null");
         } else {
@@ -93,4 +93,16 @@ public class GeofencePlugin extends CordovaPlugin {
         }
     }
 
+    private void deviceReady() {
+        Intent intent = cordova.getActivity().getIntent();
+        String data = intent.getStringExtra("geofence.notification.data");
+        String js = "setTimeout('geofence.onNotificationClicked("
+                + data + ")',0)";
+
+        if (data == null) {
+            Log.d(TAG, "No notifications clicked.");
+        } else {
+            webView.sendJavascript(js);
+        }
+    }
 }
